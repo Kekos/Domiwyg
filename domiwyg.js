@@ -24,6 +24,7 @@ function toRange(sel)
 
 var domiwyg = {
   //styles: ['background-attachment', 'background-clip', 'background-color', 'background-image', 'background-origin', 'background-position', 'background-position-x', 'background-position-y', 'background-repeat', 'background-size', 'border-bottom-color', 'border-bottom-style', 'border-bottom-width', 'border-left-color', 'border-left-style', 'border-left-width', 'border-right-color', 'border-right-style', 'border-right-width', 'border-top-color', 'border-top-style', 'border-top-width', 'border-bottom-left-radius', 'border-bottom-right-radius', 'border-top-left-radius', 'border-top-right-radius', 'bottom', 'box-shadow', 'color', 'font-family', 'font-size', 'font-size-adjust', 'font-stretch', 'font-style', 'font-variant', 'font-weight', 'letter-spacing', 'line-height', 'opacity', 'outline-color', 'outline-style', 'outline-width', 'outline-offset', 'padding-bottom', 'padding-left', 'padding-right', 'padding-top', 'right', 'text-align', 'text-decoration', 'text-indent', 'text-shadow', 'text-transform', 'vertical-align', 'white-space', 'word-spacing', 'word-wrap'],
+  allowed: {a: 1, blockquote: 1, div: 1, em: 1, h1: 1, h2: 1, h3: 1, h4: 1, h5: 1, h6: 1, img: 1, li: 1, ol: 1, p: 1, span: 1, strong: 1, ul: 1},
 
   find: function()
     {
@@ -55,6 +56,7 @@ var domiwyg = {
     self.cur_elm = null;
 
     self.save = dw.save;
+    self.sanitize = dw.sanitize;
     self.init = dw.init;
     self.clicking = dw.clicking;
     self.addElement = dw.addElement;
@@ -65,7 +67,30 @@ var domiwyg = {
 
   save: function()
     {
+    this.sanitize();
     return this.domarea.innerHTML;
+    },
+
+  sanitize: function()
+    {
+    var children = this.domarea.getElementsByTagName('*'), 
+      c, child, first_child;
+
+    for (c = 0; c < children.length; c++)
+      {
+      if (children[c].tagName.toLowerCase() in domiwyg.allowed)
+        {
+        }
+      else
+        {
+        first_child = firstChildElement(children[c]);
+        if (first_child)
+          {
+          children[c].parentNode.appendChild(first_child.cloneNode(1));
+          children[c].removeNode(first_child);
+          }
+        }
+      }
     },
 
   init: function()
