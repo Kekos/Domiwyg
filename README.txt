@@ -1,0 +1,1 @@
+This is a WYSIWYG editor that's quite strict.
