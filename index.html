@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+  <title>DOMIWYG</title>
+  <meta charset="utf-8" />
+  <!--<link href="admin/css/kwe_admin.css" rel="stylesheet" media="screen" />-->
+  <style>
+    .has-domiwyg { display: none; }
+    .domiwyg-edit { position: absolute; display: none; overflow: auto; }
+    /*.domiwyg-area p { border: 1px solid black; }*/
+    .domiwyg-app
+      {
+      height: 380px;
+      border: 1px solid #000;
+      }
+    .domiwyg-toolbar
+      {
+      height: 22px;
+      background: #c0c0c0;
+      }
+  </style>
+  <script src="kwf.js"></script>
+  <script src="domiwyg.js"></script>
+  <script>addEvent(window, 'load', domiwyg.find);</script>
+</head>
+
+<body>
+
+<div><textarea id="content_1" class="use-domiwyg">&lt;p id="p1"&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ut nunc ligula, in ultricies nibh. Suspendisse iaculis euismod rutrum. Sed vel lorem sit amet urna pretium elementum. Pellentesque purus dui, bibendum sit amet elementum nec, volutpat eget dui. Sed dictum, turpis et consequat rutrum, nibh est laoreet magna, ut semper erat turpis ut nibh. Fusce sed nulla eget ligula dapibus ultricies. In tellus nunc, euismod quis lobortis ornare, ullamcorper eget lectus. Nulla nibh risus, ultrices vitae pellentesque quis, pharetra nec elit. Suspendisse volutpat adipiscing metus in porta. Mauris et diam massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur <strong>ridiculus mus</strong>. In hac habitasse platea dictumst. Quisque vehicula quam ut erat dictum pulvinar. Quisque tempus ante sed elit convallis eu viverra metus condimentum. In ullamcorper diam ac sapien pharetra at vulputate nulla dignissim. Pellentesque a interdum ligula.&lt;/p&gt;
+&lt;p id="p2"&gt;&lt;/p&gt;
+&lt;img src=&quot;images/admin/logo.png&quot; /&gt;
+&lt;ul id="u1"&gt;
+  &lt;li id="li1"&gt;Lista1&lt;/li&gt;
+  &lt;li id="li2"&gt;Lista2&lt;/li&gt;
+  &lt;li id="li3"&gt;Lista3&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul id="u2"&gt;
+  &lt;li id="li4"&gt;Lista1&lt;/li&gt;
+&lt;/ul&gt;</textarea></div>
+
+<p><button onclick="alert(elem('content_1').domiwyg.save());">Spara</button></p>
+
+<p id="debug">&nbsp;</p>
+
+</body>
+
+</html>
