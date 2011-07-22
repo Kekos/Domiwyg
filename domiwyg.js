@@ -7,23 +7,7 @@
  * @version 1.0
  */
 
-function toRange(sel)
-  {
-  if (sel.getRangeAt)
-    return sel.getRangeAt(0);
-  else if (document.selection)
-    return sel.createRange();
-  else
-    {
-    var range = document.createRange();
-    range.setStart(sel.anchorNode, sel.anchorOffset);
-    range.setEnd(sel.focusNode, sel.focusOffset);
-    return range;
-    }
-  }
-
 var domiwyg = {
-  //styles: ['background-attachment', 'background-clip', 'background-color', 'background-image', 'background-origin', 'background-position', 'background-position-x', 'background-position-y', 'background-repeat', 'background-size', 'border-bottom-color', 'border-bottom-style', 'border-bottom-width', 'border-left-color', 'border-left-style', 'border-left-width', 'border-right-color', 'border-right-style', 'border-right-width', 'border-top-color', 'border-top-style', 'border-top-width', 'border-bottom-left-radius', 'border-bottom-right-radius', 'border-top-left-radius', 'border-top-right-radius', 'bottom', 'box-shadow', 'color', 'font-family', 'font-size', 'font-size-adjust', 'font-stretch', 'font-style', 'font-variant', 'font-weight', 'letter-spacing', 'line-height', 'opacity', 'outline-color', 'outline-style', 'outline-width', 'outline-offset', 'padding-bottom', 'padding-left', 'padding-right', 'padding-top', 'right', 'text-align', 'text-decoration', 'text-indent', 'text-shadow', 'text-transform', 'vertical-align', 'white-space', 'word-spacing', 'word-wrap'],
   allowed: {a: {href: 0}, blockquote: {}, div: {}, em: {}, h1: {}, h2: {}, h3: {}, h4: {}, h5: {}, h6: {}, img: {alt: 0, src: 0}, li: {}, ol: {}, p: {}, span: {}, strong: {}, ul: {}},
   allowed_global: {'class': 0, id: 0, title: 0},
 
@@ -155,14 +139,6 @@ var domiwyg = {
     {
     var targ = getTarget(e), 
       cls = targ.className;
-//elem('debug').innerHTML = cls;
-    if (cls.indexOf('domiwyg-edit') < 0)
-      {
-      /*if (cls.indexOf('domiwyg-area') < 0 && cls.indexOf('domiwyg-app') < 0)
-        this.editElement(targ);
-      else
-        this.stopEdit();*/
-      }
     },
 
   addElement: function(node_name)
