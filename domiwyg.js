@@ -8,6 +8,7 @@
  */
 
 var domiwyg = {
+  tool_btns: [['Source', 'Visa/dölj källkoden'], ['Link', 'Skapa/ändra länk'], ['Ulist', 'Skapa punktlista'], ['Olist', 'Skapa numrerad lista'], ['Table', 'Skapa tabell']],
   allowed: {a: {href: 0}, blockquote: {}, div: {}, em: {}, h1: {}, h2: {}, h3: {}, h4: {}, h5: {}, h6: {}, img: {alt: 0, src: 0}, li: {}, ol: {}, p: {}, span: {}, strong: {}, ul: {}},
   allowed_global: {'class': 0, id: 0, title: 0},
 
@@ -50,6 +51,7 @@ var domiwyg = {
     self.keyStrokes = dw.keyStrokes;
     self.storeCursor = dw.storeCursor;
     self.restoreCursor = dw.restoreCursor;
+    self.cmdSource = dw.cmdSource;
 
     self.init();
     },
@@ -125,9 +127,15 @@ var domiwyg = {
   init: function()
     {
     var self = this, 
-      app = self.app;
+      app = self.app, t, 
+      tool_btns = domiwyg.tool_btns, tool_html = '';
 
-    app.appendChild(toDOMnode('<div class="domiwyg-toolbar"></div>'));
+    for (t = 0; t < tool_btns.length; t++)
+      {
+      tool_html += '<button class="dwcmd-' + tool_btns[t][0] + '" title="' + tool_btns[t][1] + '">' + tool_btns[t][1] + '</button>';
+      }
+
+    app.appendChild(toDOMnode('<div class="domiwyg-toolbar">' + tool_html + '</div>'));
     self.domarea = app.appendChild(toDOMnode('<div class="domiwyg-area" contenteditable="true"></div>'));
     self.domarea.innerHTML = self.textarea.value;
     self.sanitize();
@@ -140,6 +148,9 @@ var domiwyg = {
     {
     var targ = getTarget(e), 
       cls = targ.className;
+
+    if (cls.indexOf('dwcmd-') > -1)
+      this['cmd' + cls.substring(6)](targ);
     },
 
   addElement: function(node_name)
@@ -203,5 +214,16 @@ var domiwyg = {
       }
 
     self.caret = null;
+    },
+
+  cmdSource: function(btn)
+    {
+    if (btn.className.indexOf('active') < 0)
+      {
+      
+      }
+    else
+      {
+      }
     }
   };
