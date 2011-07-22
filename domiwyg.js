@@ -92,6 +92,7 @@ var domiwyg = {
 
       /* Remove disallowed attributes */
       attributes = child.attributes;
+      child.removeAttribute('style');
       for (a = 0; a < attributes.length; a++)
         {
         attribute_name = attributes[a].name;
