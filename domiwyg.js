@@ -55,28 +55,33 @@ var domiwyg = {
     self.app = app;
     self.domarea = null;
     self.cur_elm = null;
+    self.caret = null;
 
     self.save = dw.save;
     self.sanitize = dw.sanitize;
+    self.prettyHtml = dw.prettyHtml;
     self.init = dw.init;
     self.clicking = dw.clicking;
     self.addElement = dw.addElement;
     self.keyStrokes = dw.keyStrokes;
+    self.storeCursor = dw.storeCursor;
+    self.restoreCursor = dw.restoreCursor;
 
     self.init();
     },
 
   save: function()
     {
-    return this.sanitize();
+    this.sanitize()
+    return this.prettyHtml();
     },
 
   sanitize: function()
     {
-    var domarea = this.domarea, 
-      dw = domiwyg, 
-      children = domarea.getElementsByTagName('*'), 
-      c, child, tag_name, first_child, attributes, html;
+    var dw = domiwyg, 
+      children = this.domarea.getElementsByTagName('*'), 
+      c, child, tag_name, first_child, attributes, a, 
+      attribute_name;
 
     /* Walk through all elements in domarea */
     for (c = 0; c < children.length; c++)
@@ -92,6 +97,7 @@ var domiwyg = {
           {
           child.parentNode.insertBefore(first_child.cloneNode(1), child.nextSibling);
           child.parentNode.removeChild(child);
+          continue;
           }
         }
       /* Remove empty tags */
@@ -104,29 +110,31 @@ var domiwyg = {
       attributes = child.attributes;
       for (a = 0; a < attributes.length; a++)
         {
-        /**/ attribute_name = attributes[a].name;
-        //alert(attributes[a].name);
+        attribute_name = attributes[a].name;
         if (!(attribute_name in dw.allowed[tag_name]) && !(attribute_name in dw.allowed_global))
           {
           child.removeAttribute(attribute_name);
           }
         }
       }
+    },
 
-    html = domarea.innerHTML.replace(/<\/?(\w+)((?:[^'">]*|'[^']*'|"[^"]*")*)>/g, function(tag_body, tag_name, tag_attr)
-      {
-      tag_attr = tag_attr.replace(/(\w+)(=+)(\w+)/g, '$1$2"$3"'); // Insert " around attribute values where missing
-      tag_name = tag_name.toLowerCase();
-      var closing_tag = (tag_body.match(/^<\//));
-      if (closing_tag)
-        tag_body = '</' + tag_name + '>';
-      else
-        tag_body = '<' + tag_name + tag_attr + '>';
-      return tag_body;
-      });
-    html = html.replace(/<img([^>]*)>/ig, '<img$1 />');
+  prettyHtml: function(e)
+    {
+    var html = this.domarea.innerHTML.replace(/<\/?(\w+)((?:[^'">]*|'[^']*'|"[^"]*")*)>/g,
+      function(tag_body, tag_name, tag_attr)
+        {
+        tag_attr = tag_attr.replace(/(\w+)(=+)(\w+)/g, '$1$2"$3"'); // Insert " around attribute values where missing
+        tag_name = tag_name.toLowerCase();
+        var closing_tag = (tag_body.match(/^<\//));
+        if (closing_tag)
+          tag_body = '</' + tag_name + '>';
+        else
+          tag_body = '<' + tag_name + tag_attr + '>';
+        return tag_body;
+        });
 
-    return html;
+    return html.replace(/<img([^>]*)>/ig, '<img$1 />');
     },
 
   init: function()
@@ -135,12 +143,11 @@ var domiwyg = {
       app = self.app;
 
     app.appendChild(toDOMnode('<div class="domiwyg-toolbar"></div>'));
-    self.edit = app.appendChild(toDOMnode('<textarea class="domiwyg-edit"></textarea>'));
     self.domarea = app.appendChild(toDOMnode('<div class="domiwyg-area" contenteditable="true"></div>'));
     self.domarea.innerHTML = self.textarea.value;
 
     addEvent(app, 'click', self.clicking, self);
-    addEvent(self.edit, 'keyup', self.keyStrokes, self);
+    addEvent(app, 'keyup', self.keyStrokes, self);
     },
 
   clicking: function(e)
@@ -171,14 +178,52 @@ var domiwyg = {
     var key = (e.keyCode ? e.keyCode : e.charCode), 
       self = this;
 
-    if (key == 13)
+    if (e.ctrlKey && key == 86)
       {
-      self.addElement(self.cur_elm.nodeName);
-      returnFalse(e);
+      self.storeCursor();
+      setTimeout(function()
+        {
+        self.sanitize();
+        self.restoreCursor();
+        }, 100);
       }
     /*else if (key == 40) // Down
       self.editElement(self.findElement(self.cur_elm, nextNode, firstChildElement));
     else if (key == 38) // Up
       self.editElement(self.findElement(self.cur_elm, previousNode, lastChildElement));*/
+    },
+
+  storeCursor: function()
+    {
+    if (window.getSelection)
+      {
+      this.caret = window.getSelection();
+      }
+    else if (document.selection)
+      {
+      this.caret = document.selection.createRange().getBookmark();
+      }
+    },
+
+  restoreCursor: function()
+    {
+    var range, self = this, 
+      caret = self.caret;
+
+    if (window.getSelection)
+      {
+      range = document.createRange();
+      range.setStart(caret.anchorNode, caret.anchorOffset);
+      range.setEnd(caret.focusNode, caret.focusOffset);
+      window.getSelection().addRange(range);
+      }
+    else if (document.selection)
+      {
+      range = document.selection.createRange();
+      range.moveToBookmark(caret);
+      range.select();
+      }
+
+    self.caret = null;
     }
   };
