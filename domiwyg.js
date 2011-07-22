@@ -145,6 +145,7 @@ var domiwyg = {
     app.appendChild(toDOMnode('<div class="domiwyg-toolbar"></div>'));
     self.domarea = app.appendChild(toDOMnode('<div class="domiwyg-area" contenteditable="true"></div>'));
     self.domarea.innerHTML = self.textarea.value;
+    self.sanitize();
 
     addEvent(app, 'click', self.clicking, self);
     addEvent(app, 'keyup', self.keyStrokes, self);
