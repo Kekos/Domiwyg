@@ -39,6 +39,7 @@ var domiwyg = {
     self.textarea = textarea;
     self.app = app;
     self.domarea = null;
+    self.source_editor = null;
     self.cur_elm = null;
     self.caret = null;
 
@@ -58,8 +59,13 @@ var domiwyg = {
 
   save: function()
     {
-    this.sanitize()
-    return this.prettyHtml();
+    var self = this;
+
+    if (!hasClass(self.source_editor, 'hidden'))
+      self.domarea.innerHTML = self.source_editor.value;
+
+    self.sanitize()
+    return self.prettyHtml();
     },
 
   sanitize: function()
@@ -137,6 +143,7 @@ var domiwyg = {
 
     app.appendChild(toDOMnode('<div class="domiwyg-toolbar">' + tool_html + '</div>'));
     self.domarea = app.appendChild(toDOMnode('<div class="domiwyg-area" contenteditable="true"></div>'));
+    self.source_editor = app.appendChild(toDOMnode('<textarea class="domiwyg-source-editor hidden"></textarea>'));
     self.domarea.innerHTML = self.textarea.value;
     self.sanitize();
 
@@ -147,10 +154,13 @@ var domiwyg = {
   clicking: function(e)
     {
     var targ = getTarget(e), 
-      cls = targ.className;
+      cls = targ.className, space;
 
     if (cls.indexOf('dwcmd-') > -1)
-      this['cmd' + cls.substring(6)](targ);
+      {
+      space = cls.indexOf(' ');
+      this['cmd' + cls.substring(6, (space > 0 ? space : undefined))](targ);
+      }
     },
 
   addElement: function(node_name)
@@ -218,12 +228,23 @@ var domiwyg = {
 
   cmdSource: function(btn)
     {
-    if (btn.className.indexOf('active') < 0)
+    var self = this, domarea = self.domarea, 
+      source_editor = self.source_editor;
+
+    if (hasClass(btn, 'active'))
       {
-      
+      domarea.innerHTML = source_editor.value;
+      self.sanitize();
+      removeClass(btn, 'active');
+      removeClass(domarea, 'hidden');
+      addClass(source_editor, 'hidden');
       }
     else
       {
+      source_editor.value = self.prettyHtml();
+      addClass(btn, 'active');
+      addClass(domarea, 'hidden');
+      removeClass(source_editor, 'hidden');
       }
     }
   };
