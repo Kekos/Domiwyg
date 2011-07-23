@@ -8,7 +8,7 @@
  */
 
 var domiwyg = {
-  tool_btns: [['Source', 'Visa/dölj källkoden'], ['Link', 'Skapa/ändra länk'], ['Ulist', 'Skapa punktlista'], ['Olist', 'Skapa numrerad lista'], ['Table', 'Skapa tabell']],
+  tool_btns: [['Source', 'Visa/dölj källkoden'], ['Link', 'Skapa/ändra länk'], ['Image', 'Infoga bild'], ['Ulist', 'Infoga punktlista'], ['Olist', 'Infoga numrerad lista'], ['Table', 'Infoga tabell']],
   allowed: {a: {href: 0}, blockquote: {}, div: {}, em: {}, h1: {}, h2: {}, h3: {}, h4: {}, h5: {}, h6: {}, img: {alt: 0, src: 0}, li: {}, ol: {}, p: {}, span: {}, strong: {}, ul: {}},
   allowed_global: {'class': 0, id: 0, title: 0},
 
@@ -246,5 +246,25 @@ var domiwyg = {
       addClass(domarea, 'hidden');
       removeClass(source_editor, 'hidden');
       }
+    },
+
+  cmdLink: function()
+    {
+    },
+
+  cmdImage: function()
+    {
+    },
+
+  cmdUlist: function()
+    {
+    },
+
+  cmdOlist: function()
+    {
+    },
+
+  cmdTable: function()
+    {
     }
   };
