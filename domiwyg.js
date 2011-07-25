@@ -167,6 +167,8 @@ var domiwyg = {
     self.sanitize();
 
     addEvent(app, 'click', self.clicking, self);
+    addEvent(self.domarea, 'focus', function() { addClass(app, 'focus'); });
+    addEvent(self.domarea, 'blur', function() { removeClass(app, 'focus'); });
     addEvent(app, 'keyup', self.keyStrokes, self);
     },
 
@@ -180,6 +182,8 @@ var domiwyg = {
       space = cls.indexOf(' ');
       this['cmd' + cls.substring(6, (space > 0 ? space : undefined))](targ);
       }
+
+    addClass(this.app, 'focus');
     },
 
   addElement: function(node_name)
