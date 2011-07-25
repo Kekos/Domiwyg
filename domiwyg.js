@@ -7,6 +7,21 @@
  * @version 1.0
  */
 
+function removeTag(element)
+  {
+  var first_child = firstChildElement(element), 
+    ret = 0;
+
+  if (first_child)
+    {
+    element.parentNode.insertBefore(first_child.cloneNode(1), element.nextSibling);
+    element.parentNode.removeChild(element);
+    ret = 1;
+    }
+
+  return ret;
+  }
+
 var domiwyg = {
   tool_btns: [['Source', 'Visa/dölj källkoden'], ['Link', 'Skapa/ändra länk'], ['Image', 'Infoga bild'], ['Ulist', 'Infoga punktlista'], ['Olist', 'Infoga numrerad lista'], ['Table', 'Infoga tabell']],
   allowed: {a: {href: 0}, blockquote: {}, div: {}, em: {}, h1: {}, h2: {}, h3: {}, h4: {}, h5: {}, h6: {}, img: {alt: 0, src: 0}, li: {}, ol: {}, p: {}, span: {}, strong: {}, ul: {}},
@@ -53,9 +68,11 @@ var domiwyg = {
     self.keyStrokes = dw.keyStrokes;
     self.storeCursor = dw.storeCursor;
     self.restoreCursor = dw.restoreCursor;
+    self.nodeInArea = dw.nodeInArea;
     self.format = dw.format;
     self.cmdSource = dw.cmdSource;
     self.cmdLink = dw.cmdLink;
+    self.createLink = dw.createLink;
     self.cmdImage = dw.cmdImage;
     self.cmdUlist = dw.cmdUlist;
     self.cmdOlist = dw.cmdOlist;
@@ -79,7 +96,7 @@ var domiwyg = {
     {
     var dw = domiwyg, 
       children = this.domarea.getElementsByTagName('*'), 
-      c, child, tag_name, first_child, attributes, a, 
+      c, child, tag_name, attributes, a, 
       attribute_name;
 
     /* Walk through all elements in domarea */
@@ -91,13 +108,8 @@ var domiwyg = {
       /* Remove disallowed tags */
       if (!(tag_name in dw.allowed))
         {
-        first_child = firstChildElement(child);
-        if (first_child)
-          {
-          child.parentNode.insertBefore(first_child.cloneNode(1), child.nextSibling);
-          child.parentNode.removeChild(child);
+        if (removeTag(child))
           continue;
-          }
         }
       /* Remove empty tags */
       else if (tag_name != 'img' && !child.childNodes.length)
@@ -203,7 +215,9 @@ var domiwyg = {
     {
     if (window.getSelection)
       {
-      this.caret = window.getSelection();
+      var selection = window.getSelection();
+      this.caret = { anchorNode: selection.anchorNode, anchorOffset: selection.anchorOffset, 
+        focusNode: selection.focusNode, focusOffset: selection.focusOffset };
       }
     else if (document.selection)
       {
@@ -233,11 +247,29 @@ var domiwyg = {
     self.caret = null;
     },
 
-  format: function(cmd)
+  nodeInArea: function(node)
     {
+    while (node.nodeName.toLowerCase() != 'body')
+      {
+      if (node == this.domarea)
+        {
+        return 1;
+        }
+
+      node = node.parentNode;
+      }
+
+    return 0;
+    },
+
+  format: function(cmd, arg)
+    {
+    if (typeof arg == 'undefined')
+      arg = null;
+
     try
       {
-      document.execCommand(cmd, false, null);
+      document.execCommand(cmd, false, arg);
       }
     catch (e)
       {
@@ -271,6 +303,96 @@ var domiwyg = {
 
   cmdLink: function()
     {
+    boxing.show('<h1>Infoga länk</h1>'
+      + '<p>Skriv in adressen dit länken ska leda. Välj även vilket protokoll som ska användas.</p>'
+      + '<p><select id="link_protocol">'
+      + '    <option value="">samma webbplats</option>'
+      + '    <option value="http:">http: (webbsida)</option>'
+      + '    <option value="https:">https: (säker sida)</option>'
+      + '    <option value="mailto:">mailto: (e-post)</option>'
+      + '    <option value="ftp:">ftp: (filöverföring)</option>'
+      + '  </select> <input type="text" id="link_url" value="www.example.com" /></p>'
+      + '<p>Om du vill ta bort en länk, markera <strong>hela</strong> länken och lämna fältet tomt här ovan.</p>'
+      + '<p><button id="btn_create_link" class="hide-boxing">OK</button> <button class="hide-boxing">Avbryt</button></p>', 400, 190);
+
+    var self = this, selected, element, node_name = null, link, colon;
+
+    if (window.getSelection)
+      {
+      selected = window.getSelection();
+      if (self.nodeInArea(selected.focusNode))
+        {
+        element = selected.focusNode.parentNode;
+        node_name = element.nodeName.toLowerCase();
+        }
+      }
+    else if (document.selection)
+      {
+      selected = document.selection.createRange();
+      element = selected.parentElement();
+      if (self.nodeInArea(element))
+        {
+        node_name = element.nodeName.toLowerCase();
+        }
+      }
+
+    self.storeCursor();
+    elem('link_url').focus();
+
+    if (node_name)
+      {
+      if (node_name == 'a')
+        {
+        link = element.getAttribute('href');
+        if (link.indexOf(':') < 0 || link.indexOf(':') > 6)
+          {
+          elem('link_protocol').value = '';
+          elem('link_url').value = link;
+          }
+        else
+          {
+          colon = link.indexOf(':') + 1;
+          elem('link_protocol').value = link.substring(0, colon);
+          elem('link_url').value = link.substring(colon);
+          }
+        }
+      else
+        element = null;
+
+      addEvent(elem('btn_create_link'), 'click', function()
+        {
+        self.createLink(element);
+        });
+      }
+    else
+      {
+      boxing.hide();
+      }
+    },
+
+  createLink: function(element)
+    {
+    var protocol = elem('link_protocol').value, 
+      url = elem('link_url').value;
+
+    this.restoreCursor();
+
+    if (url == '')
+      {
+      if (element)
+        removeTag(element);
+      }
+    else
+      {
+      url = url.replace(/^[a-z]{3,6}:(\/\/)?/ig, '');
+      if (protocol != 'mailto:' && protocol != '' && url.indexOf('//') != 0)
+        url = '//' + url;
+
+      if (element)
+        element.setAttribute('href', protocol + url);
+      else
+        this.format('createlink', protocol + url);
+      }
     },
 
   cmdImage: function()
