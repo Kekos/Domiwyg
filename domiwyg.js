@@ -295,6 +295,7 @@ var domiwyg = {
       removeClass(btn, 'active');
       removeClass(domarea, 'hidden');
       addClass(source_editor, 'hidden');
+      domarea.focus();
       }
     else
       {
@@ -302,6 +303,7 @@ var domiwyg = {
       addClass(btn, 'active');
       addClass(domarea, 'hidden');
       removeClass(source_editor, 'hidden');
+      source_editor.focus();
       }
     },
 
