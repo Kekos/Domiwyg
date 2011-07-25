@@ -11,6 +11,7 @@ var domiwyg = {
   tool_btns: [['Source', 'Visa/dölj källkoden'], ['Link', 'Skapa/ändra länk'], ['Image', 'Infoga bild'], ['Ulist', 'Infoga punktlista'], ['Olist', 'Infoga numrerad lista'], ['Table', 'Infoga tabell']],
   allowed: {a: {href: 0}, blockquote: {}, div: {}, em: {}, h1: {}, h2: {}, h3: {}, h4: {}, h5: {}, h6: {}, img: {alt: 0, src: 0}, li: {}, ol: {}, p: {}, span: {}, strong: {}, ul: {}},
   allowed_global: {'class': 0, id: 0, title: 0},
+  lang: {err_format_support1: 'The format command ', err_format_support2: ' was not supported by your browser.', err_number_format: 'You must enter a number.'},
 
   find: function()
     {
@@ -52,7 +53,13 @@ var domiwyg = {
     self.keyStrokes = dw.keyStrokes;
     self.storeCursor = dw.storeCursor;
     self.restoreCursor = dw.restoreCursor;
+    self.format = dw.format;
     self.cmdSource = dw.cmdSource;
+    self.cmdLink = dw.cmdLink;
+    self.cmdImage = dw.cmdImage;
+    self.cmdUlist = dw.cmdUlist;
+    self.cmdOlist = dw.cmdOlist;
+    self.cmdTable = dw.cmdTable;
 
     self.init();
     },
@@ -226,6 +233,20 @@ var domiwyg = {
     self.caret = null;
     },
 
+  format: function(cmd)
+    {
+    try
+      {
+      document.execCommand(cmd, false, null);
+      }
+    catch (e)
+      {
+      alert(domiwyg.lang.err_format_support1 + cmd + domiwyg.lang.err_format_support2);
+      }
+
+    this.domarea.focus();
+    },
+
   cmdSource: function(btn)
     {
     var self = this, domarea = self.domarea, 
@@ -258,10 +279,12 @@ var domiwyg = {
 
   cmdUlist: function()
     {
+    this.format('insertunorderedlist');
     },
 
   cmdOlist: function()
     {
+    this.format('insertorderedlist');
     },
 
   cmdTable: function()
