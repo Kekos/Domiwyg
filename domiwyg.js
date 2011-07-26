@@ -69,11 +69,13 @@ var domiwyg = {
     self.storeCursor = dw.storeCursor;
     self.restoreCursor = dw.restoreCursor;
     self.nodeInArea = dw.nodeInArea;
+    self.getSelectedAreaElement = dw.getSelectedAreaElement;
     self.format = dw.format;
     self.cmdSource = dw.cmdSource;
     self.cmdLink = dw.cmdLink;
     self.createLink = dw.createLink;
     self.cmdImage = dw.cmdImage;
+    self.insertImage = dw.insertImage;
     self.cmdUlist = dw.cmdUlist;
     self.cmdOlist = dw.cmdOlist;
     self.cmdTable = dw.cmdTable;
@@ -266,6 +268,31 @@ var domiwyg = {
     return 0;
     },
 
+  getSelectedAreaElement: function()
+    {
+    var selection, element = null;
+
+    if (window.getSelection)
+      {
+      selection = window.getSelection();
+      if (this.nodeInArea(selection.focusNode))
+        {
+        element = selection.focusNode.parentNode;
+        }
+      }
+    else if (document.selection)
+      {
+      selection = document.selection.createRange();
+      element = selection.parentElement();
+      if (!this.nodeInArea(element))
+        {
+        element = null;
+        }
+      }
+
+    return element;
+    },
+
   format: function(cmd, arg)
     {
     if (typeof arg == 'undefined')
@@ -273,7 +300,7 @@ var domiwyg = {
 
     try
       {
-      document.execCommand(cmd, false, arg);
+      document.execCommand(cmd, 0, arg);
       }
     catch (e)
       {
@@ -309,79 +336,67 @@ var domiwyg = {
 
   cmdLink: function()
     {
-    boxing.show('<h1>Infoga länk</h1>'
-      + '<p>Skriv in adressen dit länken ska leda. Välj även vilket protokoll som ska användas.</p>'
-      + '<p><select id="link_protocol">'
-      + '    <option value="">samma webbplats</option>'
-      + '    <option value="http:">http: (webbsida)</option>'
-      + '    <option value="https:">https: (säker sida)</option>'
-      + '    <option value="mailto:">mailto: (e-post)</option>'
-      + '    <option value="ftp:">ftp: (filöverföring)</option>'
-      + '  </select> <input type="text" id="link_url" value="www.example.com" /></p>'
-      + '<p>Om du vill ta bort en länk, markera <strong>hela</strong> länken och lämna fältet tomt här ovan.</p>'
-      + '<p><button id="btn_create_link" class="hide-boxing">OK</button> <button class="hide-boxing">Avbryt</button></p>', 400, 190);
+    var self = this, 
+      element = self.getSelectedAreaElement(), 
+      node_name = null, link, colon;
 
-    var self = this, selected, element, node_name = null, link, colon;
-
-    if (window.getSelection)
+    if (element)
       {
-      selected = window.getSelection();
-      if (self.nodeInArea(selected.focusNode))
-        {
-        element = selected.focusNode.parentNode;
-        node_name = element.nodeName.toLowerCase();
-        }
-      }
-    else if (document.selection)
-      {
-      selected = document.selection.createRange();
-      element = selected.parentElement();
-      if (self.nodeInArea(element))
-        {
-        node_name = element.nodeName.toLowerCase();
-        }
-      }
+      node_name = element.nodeName.toLowerCase();
+      self.storeCursor();
 
-    self.storeCursor();
-    elem('link_url').focus();
+      boxing.show('<h1>Infoga länk</h1>'
+        + '<p>Skriv in adressen dit länken ska leda. Välj även vilket protokoll som ska användas.</p>'
+        + '<p><select id="link_protocol">'
+        + '    <option value="">samma webbplats</option>'
+        + '    <option value="http:">http: (webbsida)</option>'
+        + '    <option value="https:">https: (säker sida)</option>'
+        + '    <option value="mailto:">mailto: (e-post)</option>'
+        + '    <option value= "ftp:">ftp: (filöverföring)</option>'
+        + '  </select> <input type="text" id="link_url" value="www.example.com" /></p>'
+        + '<p>Om du vill ta bort en länk, markera <strong>hela</strong> länken och lämna fältet tomt här ovan.</p>'
+        + '<p><button id="btn_create_link" class="hide-boxing">OK</button> <button class="hide-boxing">Avbryt</button></p>', 400, 190);
+      elem('link_url').focus();
 
-    if (node_name)
-      {
-      if (node_name == 'a')
+      if (node_name)
         {
-        link = element.getAttribute('href');
-        if (link.indexOf(':') < 0 || link.indexOf(':') > 6)
+        if (node_name == 'a')
           {
-          elem('link_protocol').value = '';
-          elem('link_url').value = link;
+          link = element.getAttribute('href');
+          if (link.indexOf(':') < 0 || link.indexOf(':') > 6)
+            {
+            elem('link_protocol').value = '';
+            elem('link_url').value = link;
+            }
+          else
+            {
+            colon = link.indexOf(':') + 1;
+            elem('link_protocol').value = link.substring(0, colon);
+            elem('link_url').value = link.substring(colon);
+            }
           }
         else
+          element = null;
+
+        addEvent(elem('btn_create_link'), 'click', function()
           {
-          colon = link.indexOf(':') + 1;
-          elem('link_protocol').value = link.substring(0, colon);
-          elem('link_url').value = link.substring(colon);
-          }
+          self.createLink(element);
+          });
         }
       else
-        element = null;
-
-      addEvent(elem('btn_create_link'), 'click', function()
         {
-        self.createLink(element);
-        });
-      }
-    else
-      {
-      boxing.hide();
+        boxing.hide();
+        }
       }
     },
 
   createLink: function(element)
     {
-    var protocol = elem('link_protocol').value, 
+    var self = this, 
+      protocol = elem('link_protocol').value, 
       url = elem('link_url').value;
 
-    this.restoreCursor();
+    self.restoreCursor();
 
     if (url == '')
       {
@@ -395,14 +410,46 @@ var domiwyg = {
         url = '//' + url;
 
       if (element)
+        {
         element.setAttribute('href', protocol + url);
+        }
       else
-        this.format('createlink', protocol + url);
+        {
+        self.domarea.designMode = 'on'; // Workaround for bug in Firefox (it throws an error even if the format command actually runs)
+        self.format('createlink', protocol + url);
+        self.domarea.designMode = 'off';
+        }
       }
     },
 
   cmdImage: function()
     {
+    var self = this;
+
+    if (self.getSelectedAreaElement())
+      {
+      self.storeCursor();
+
+      boxing.show('<h1>Infoga bild</h1>'
+        + '<p>Skriv in adressen till bilden.</p>'
+        + '<p>Bild-URL: <input type="text" id="img_url" value="" /></p>'
+        + '<p><button id="btn_insert_image" class="hide-boxing">OK</button> <button class="hide-boxing">Avbryt</button></p>', 400, 110);
+
+      elem('img_url').focus();
+      addEvent(elem('btn_insert_image'), 'click', self.insertImage, self);
+      }
+    },
+
+  insertImage: function()
+    {
+    var url = elem('img_url').value;
+
+    this.restoreCursor();
+
+    if (url != '')
+      {
+      this.format('insertimage', url);
+      }
     },
 
   cmdUlist: function()
