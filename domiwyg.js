@@ -9,17 +9,15 @@
 
 function removeTag(element)
   {
-  var first_child = firstChildElement(element), 
-    ret = 0;
+  var fragment = document.createDocumentFragment();
 
-  if (first_child)
+  while (element.firstChild)
     {
-    element.parentNode.insertBefore(first_child.cloneNode(1), element.nextSibling);
-    element.parentNode.removeChild(element);
-    ret = 1;
+    fragment.appendChild(element.firstChild);
     }
 
-  return ret;
+  element.parentNode.insertBefore(fragment, element);
+  element.parentNode.removeChild(element);
   }
 
 var domiwyg = {
@@ -111,8 +109,8 @@ var domiwyg = {
       /* Remove disallowed tags */
       if (!(tag_name in dw.allowed))
         {
-        if (removeTag(child))
-          continue;
+        removeTag(child);
+        continue;
         }
       /* Remove empty tags */
       else if (tag_name != 'img' && !child.childNodes.length)
