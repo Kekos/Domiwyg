@@ -318,6 +318,7 @@ var domiwyg = {
 
     if (hasClass(btn, 'active'))
       {
+      /* Turn off source editing */
       domarea.innerHTML = source_editor.value;
       self.sanitize();
       removeClass(btn, 'active');
@@ -327,6 +328,7 @@ var domiwyg = {
       }
     else
       {
+      /* Turn on source editing */
       source_editor.value = self.prettyHtml();
       addClass(btn, 'active');
       addClass(domarea, 'hidden');
