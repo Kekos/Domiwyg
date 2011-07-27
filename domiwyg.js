@@ -24,7 +24,7 @@ function removeTag(element)
 
 var domiwyg = {
   tool_btns: [['Source', 'Visa/dölj källkoden'], ['Link', 'Skapa/ändra länk'], ['Image', 'Infoga bild'], ['Ulist', 'Infoga punktlista'], ['Olist', 'Infoga numrerad lista'], ['Table', 'Infoga tabell']],
-  allowed: {a: {href: 0}, blockquote: {}, div: {}, em: {}, h1: {}, h2: {}, h3: {}, h4: {}, h5: {}, h6: {}, img: {alt: 0, src: 0}, li: {}, ol: {}, p: {}, span: {}, strong: {}, ul: {}},
+  allowed: {a: {href: 0}, blockquote: {}, div: {}, em: {}, h1: {}, h2: {}, h3: {}, h4: {}, h5: {}, h6: {}, img: {alt: 0, src: 0}, li: {}, ol: {}, p: {}, span: {}, strong: {}, table: {}, tr: {}, td: {}, ul: {}},
   allowed_global: {'class': 0, id: 0, title: 0},
   lang: {err_format_support1: 'The format command ', err_format_support2: ' was not supported by your browser.', err_number_format: 'You must enter a number.'},
 
@@ -79,6 +79,7 @@ var domiwyg = {
     self.cmdUlist = dw.cmdUlist;
     self.cmdOlist = dw.cmdOlist;
     self.cmdTable = dw.cmdTable;
+    self.insertTable = dw.insertTable;
 
     self.init();
     },
@@ -464,5 +465,49 @@ var domiwyg = {
 
   cmdTable: function()
     {
+    var self = this, element = self.getSelectedAreaElement();
+
+    if (element)
+      {
+      self.storeCursor();
+
+      boxing.show('<h1>Infoga tabell</h1>'
+        + '<p class="domiwyg-form"><label for="dw_num_rows">Antal rader:</label> <input type="text" id="dw_num_rows" value="" />'
+        + '  <label for="dw_num_cols">Antal kolumner:</label> <input type="text" id="dw_num_cols" value="" /></p>'
+        + '<p><button id="btn_insert_table" class="hide-boxing">OK</button> <button class="hide-boxing">Avbryt</button></p>', 400, 110);
+
+      elem('dw_num_rows').focus();
+      addEvent(elem('btn_insert_table'), 'click', function()
+        {
+        self.insertTable(element);
+        });
+      }
+    },
+
+  insertTable: function(element)
+    {
+    var rows = parseInt(elem('dw_num_rows').value, 10), 
+      cols = parseInt(elem('dw_num_cols').value, 10), 
+      doc = document, r, c, 
+      table = doc.createElement('table'), tr, td;
+
+    this.restoreCursor();
+
+    if (rows > 0 && cols > 0)
+      {
+      for (r = 0; r < rows; r++)
+        {
+        tr = doc.createElement('tr');
+        table.appendChild(tr);
+        for (c = 0; c < cols; c++)
+          {
+          td = doc.createElement('td');
+          td.appendChild(doc.createTextNode('Cell'));
+          tr.appendChild(td);
+          }
+        }
+
+      element.parentNode.insertBefore(table, element);
+      }
     }
   };
