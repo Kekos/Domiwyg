@@ -460,9 +460,10 @@ var domiwyg = {
         }
       else
         {
-        self.domarea.designMode = 'on'; // Workaround for bug in Firefox (it throws an error even if the format command actually runs)
-        self.format('createlink', protocol + url);
-        self.domarea.designMode = 'off';
+        setTimeout(function()
+          {
+          self.format('createlink', protocol + url);
+          }, 100); // Workaround for bug in Firefox (it throws an error even if the format command actually runs)
         }
       }
     },
