@@ -24,7 +24,10 @@ var domiwyg = {
   tool_btns: [['Source', 'Visa/dölj källkoden'], ['Link', 'Skapa/ändra länk'], ['Image', 'Infoga bild'], ['Ulist', 'Infoga punktlista'], ['Olist', 'Infoga numrerad lista'], ['Table', 'Infoga tabell']],
   allowed: {a: {href: 0}, blockquote: {}, div: {}, em: {}, h1: {}, h2: {}, h3: {}, h4: {}, h5: {}, h6: {}, img: {alt: 0, src: 0}, li: {}, ol: {}, p: {}, span: {}, strong: {}, table: {}, tr: {}, td: {}, ul: {}},
   allowed_global: {'class': 0, id: 0, title: 0},
-  lang: {err_format_support1: 'The format command ', err_format_support2: ' was not supported by your browser.', err_number_format: 'You must enter a number.'},
+  lang: {err_format_support1: 'The format command ', err_format_support2: ' was not supported by your browser.', err_number_format: 'You must enter a number.', 
+    no_elem_active: '(no element selected)', tag_a: 'Link', tag_blockquote: 'Blockquote', tag_div: 'Container', tag_em: 'Emphasized', tag_h1: 'Header 1', tag_h2: 'Header 2', 
+    tag_h3: 'Header 3', tag_h4: 'Header 4', tag_h5: 'Header 5', tag_h6: 'Header 6', tag_img: 'Image', tag_li: 'List element', tag_ol: 'Ordered list', tag_p: 'Paragraph', 
+    tag_span: 'Span', tag_strong: 'Strong', tag_table: 'Table', tag_tr: 'Table row', tag_td: 'Table cell', tag_ul: 'Unordered list', cssclass: 'Class'},
 
   find: function()
     {
@@ -51,6 +54,7 @@ var domiwyg = {
       self = this;
 
     self.textarea = textarea;
+    self.domcrumbs = null;
     self.app = app;
     self.domarea = null;
     self.source_editor = null;
@@ -62,6 +66,7 @@ var domiwyg = {
     self.prettyHtml = dw.prettyHtml;
     self.init = dw.init;
     self.clicking = dw.clicking;
+    self.updateDomCrumbs = dw.updateDomCrumbs;
     self.addElement = dw.addElement;
     self.keyStrokes = dw.keyStrokes;
     self.storeCursor = dw.storeCursor;
@@ -153,7 +158,7 @@ var domiwyg = {
   init: function()
     {
     var self = this, 
-      app = self.app, t, 
+      app = self.app, domarea, t, 
       tool_btns = domiwyg.tool_btns, tool_html = '';
 
     for (t = 0; t < tool_btns.length; t++)
@@ -162,14 +167,16 @@ var domiwyg = {
       }
 
     app.appendChild(toDOMnode('<div class="domiwyg-toolbar">' + tool_html + '</div>'));
-    self.domarea = app.appendChild(toDOMnode('<div class="domiwyg-area" contenteditable="true"></div>'));
+    self.domcrumbs = app.appendChild(toDOMnode('<div class="domiwyg-dom-crumbs">&nbsp;</div>'));
+    domarea = self.domarea = app.appendChild(toDOMnode('<div class="domiwyg-area" contenteditable="true"></div>'));
     self.source_editor = app.appendChild(toDOMnode('<textarea class="domiwyg-source-editor hidden"></textarea>'));
-    self.domarea.innerHTML = self.textarea.value;
+    domarea.innerHTML = self.textarea.value;
     self.sanitize();
 
     addEvent(app, 'click', self.clicking, self);
-    addEvent(self.domarea, 'focus', function() { addClass(app, 'focus'); });
-    addEvent(self.domarea, 'blur', function() { removeClass(app, 'focus'); });
+    addEvent(domarea, 'click', self.updateDomCrumbs, self);
+    addEvent(domarea, 'focus', function() { addClass(app, 'focus'); });
+    addEvent(domarea, 'blur', function() { removeClass(app, 'focus'); });
     addEvent(app, 'keyup', self.keyStrokes, self);
     },
 
@@ -185,6 +192,31 @@ var domiwyg = {
       }
 
     addClass(this.app, 'focus');
+    },
+
+  updateDomCrumbs: function(e)
+    {
+    var element = getTarget(e), 
+      crumbs = [], lang_name, text, 
+      lang = domiwyg.lang, cls, id;
+
+    while (!hasClass(element, 'domiwyg-area'))
+      {
+      text = element.tagName.toLowerCase();
+      lang_name = 'tag_' + text;
+      if (lang_name in lang)
+        text = lang[lang_name];
+
+      cls = (lang.cssclass + ': ' + element.className + ' ' || '');
+      id = ('ID: ' + element.id || '');
+      crumbs.push('<span' + (cls || id ? ' title="' + cls + id + '"' : '') + '>' + text + '</span>');
+
+      element = element.parentNode;
+      }
+
+    crumbs.reverse();
+    crumbs = crumbs.join(' &gt; ');
+    this.domcrumbs.innerHTML = (crumbs || lang.no_elem_active);
     },
 
   addElement: function(node_name)
