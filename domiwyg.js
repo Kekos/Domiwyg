@@ -174,10 +174,11 @@ var domiwyg = {
     self.sanitize();
 
     addEvent(app, 'click', self.clicking, self);
+    addEvent(app, 'keyup', self.keyStrokes, self);
     addEvent(domarea, 'click', self.updateDomCrumbs, self);
     addEvent(domarea, 'focus', function() { addClass(app, 'focus'); });
     addEvent(domarea, 'blur', function() { removeClass(app, 'focus'); });
-    addEvent(app, 'keyup', self.keyStrokes, self);
+    addEvent(domarea, 'keyup', self.updateDomCrumbs, self);
     },
 
   clicking: function(e)
@@ -196,27 +197,38 @@ var domiwyg = {
 
   updateDomCrumbs: function(e)
     {
-    var element = getTarget(e), 
+    var self = this, 
+      element = getTarget(e), 
       crumbs = [], lang_name, text, 
       lang = domiwyg.lang, cls, id;
 
-    while (!hasClass(element, 'domiwyg-area'))
+    if (e.keyCode)
       {
-      text = element.tagName.toLowerCase();
-      lang_name = 'tag_' + text;
-      if (lang_name in lang)
-        text = lang[lang_name];
-
-      cls = (lang.cssclass + ': ' + element.className + ' ' || '');
-      id = ('ID: ' + element.id || '');
-      crumbs.push('<span' + (cls || id ? ' title="' + cls + id + '"' : '') + '>' + text + '</span>');
-
-      element = element.parentNode;
+      element = self.getSelectedAreaElement();
       }
 
-    crumbs.reverse();
-    crumbs = crumbs.join(' &gt; ');
-    this.domcrumbs.innerHTML = (crumbs || lang.no_elem_active);
+    if (self.cur_elm != element)
+      {
+      self.cur_elm = element;
+
+      while (!hasClass(element, 'domiwyg-area'))
+        {
+        text = element.tagName.toLowerCase();
+        lang_name = 'tag_' + text;
+        if (lang_name in lang)
+          text = lang[lang_name];
+
+        cls = (element.className ? lang.cssclass + ': ' + element.className + ' ' : '');
+        id = (element.id ? 'ID: ' + element.id : '');
+        crumbs.push('<span' + (cls || id ? ' title="' + cls + id + '"' : '') + '>' + text + '</span>');
+
+        element = element.parentNode;
+        }
+
+      crumbs.reverse();
+      crumbs = crumbs.join(' &gt; ');
+      self.domcrumbs.innerHTML = (crumbs || lang.no_elem_active);
+      }
     },
 
   addElement: function(node_name)
