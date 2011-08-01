@@ -21,7 +21,7 @@ function removeTag(element)
   }
 
 var domiwyg = {
-  tool_btns: [['Source', 'Visa/dölj källkoden'], ['Link', 'Skapa/ändra länk'], ['Image', 'Infoga bild'], ['Ulist', 'Infoga punktlista'], ['Olist', 'Infoga numrerad lista'], ['Table', 'Infoga tabell']],
+  tool_btns: [['Source', 'Toggle source editing'], ['Link', 'Create/edit link'], ['Image', 'Insert image'], ['Ulist', 'Insert unordered list'], ['Olist', 'Insert ordered list'], ['Table', 'Insert table']],
   allowed: {a: {href: 0}, blockquote: {}, div: {}, em: {}, h1: {}, h2: {}, h3: {}, h4: {}, h5: {}, h6: {}, img: {alt: 0, src: 0}, li: {}, ol: {}, p: {}, span: {}, strong: {}, table: {}, tr: {}, td: {}, ul: {}},
   allowed_global: {'class': 0, id: 0, title: 0},
   lang: {err_format_support1: 'The format command ', err_format_support2: ' was not supported by your browser.', err_number_format: 'You must enter a number.', 
