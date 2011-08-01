@@ -392,16 +392,16 @@ var domiwyg = {
 
       boxing.show('<h1>Infoga länk</h1>'
         + '<p>Skriv in adressen dit länken ska leda. Välj även vilket protokoll som ska användas.</p>'
-        + '<p><select id="link_protocol">'
+        + '<p><select id="dw_link_protocol">'
         + '    <option value="">samma webbplats</option>'
         + '    <option value="http:">http: (webbsida)</option>'
         + '    <option value="https:">https: (säker sida)</option>'
         + '    <option value="mailto:">mailto: (e-post)</option>'
         + '    <option value= "ftp:">ftp: (filöverföring)</option>'
-        + '  </select> <input type="text" id="link_url" value="www.example.com" /></p>'
+        + '  </select> <input type="text" id="dw_link_url" value="www.example.com" /></p>'
         + '<p>Om du vill ta bort en länk, markera <strong>hela</strong> länken och lämna fältet tomt här ovan.</p>'
         + '<p><button id="btn_create_link" class="hide-boxing">OK</button> <button class="hide-boxing">Avbryt</button></p>', 400, 190);
-      elem('link_url').focus();
+      elem('dw_link_url').focus();
 
       if (node_name)
         {
@@ -410,14 +410,14 @@ var domiwyg = {
           link = element.getAttribute('href');
           if (link.indexOf(':') < 0 || link.indexOf(':') > 6)
             {
-            elem('link_protocol').value = '';
-            elem('link_url').value = link;
+            elem('dw_link_protocol').value = '';
+            elem('dw_link_url').value = link;
             }
           else
             {
             colon = link.indexOf(':') + 1;
-            elem('link_protocol').value = link.substring(0, colon);
-            elem('link_url').value = link.substring(colon);
+            elem('dw_link_protocol').value = link.substring(0, colon);
+            elem('dw_link_url').value = link.substring(colon);
             }
           }
         else
@@ -438,8 +438,8 @@ var domiwyg = {
   createLink: function(element)
     {
     var self = this, 
-      protocol = elem('link_protocol').value, 
-      url = elem('link_url').value;
+      protocol = elem('dw_link_protocol').value, 
+      url = elem('dw_link_url').value;
 
     self.restoreCursor();
 
@@ -478,17 +478,17 @@ var domiwyg = {
 
       boxing.show('<h1>Infoga bild</h1>'
         + '<p>Skriv in adressen till bilden.</p>'
-        + '<p>Bild-URL: <input type="text" id="img_url" value="" /></p>'
+        + '<p>Bild-URL: <input type="text" id="dw_img_url" value="" /></p>'
         + '<p><button id="btn_insert_image" class="hide-boxing">OK</button> <button class="hide-boxing">Avbryt</button></p>', 400, 110);
 
-      elem('img_url').focus();
+      elem('dw_img_url').focus();
       addEvent(elem('btn_insert_image'), 'click', self.insertImage, self);
       }
     },
 
   insertImage: function()
     {
-    var url = elem('img_url').value;
+    var url = elem('dw_img_url').value;
 
     this.restoreCursor();
 
