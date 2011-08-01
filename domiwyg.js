@@ -22,6 +22,8 @@ function removeTag(element)
 
 var domiwyg = {
   tool_btns: [['Source', 'Toggle source editing'], ['Link', 'Create/edit link'], ['Image', 'Insert image'], ['Ulist', 'Insert unordered list'], ['Olist', 'Insert ordered list'], ['Table', 'Insert table']],
+  styles: [['<p></p>', 1, 'Paragraph'], ['<h1></h1>', 1, 'Header 1'], ['<h2></h2>', 1, 'Header 2'], ['<h3></h3>', 1, 'Header 3'], ['<h4></h4>', 1, 'Header 4'], ['<h5></h5>', 1, 'Header 5'], 
+    ['<h6></h6>', 1, 'Header 6'], ['<blockquote></blockquote>', 1, 'Blockquote']],
   allowed: {a: {href: 0}, blockquote: {}, div: {}, em: {}, h1: {}, h2: {}, h3: {}, h4: {}, h5: {}, h6: {}, img: {alt: 0, src: 0}, li: {}, ol: {}, p: {}, span: {}, strong: {}, table: {}, tr: {}, td: {}, ul: {}},
   allowed_global: {'class': 0, id: 0, title: 0},
   lang: {err_format_support1: 'The format command ', err_format_support2: ' was not supported by your browser.', err_number_format: 'You must enter a number.', 
@@ -67,7 +69,7 @@ var domiwyg = {
     self.init = dw.init;
     self.clicking = dw.clicking;
     self.updateDomCrumbs = dw.updateDomCrumbs;
-    self.addElement = dw.addElement;
+    self.addStylingElement = dw.addStylingElement;
     self.keyStrokes = dw.keyStrokes;
     self.storeCursor = dw.storeCursor;
     self.restoreCursor = dw.restoreCursor;
@@ -159,17 +161,28 @@ var domiwyg = {
     {
     var self = this, 
       app = self.app, domarea, t, 
-      tool_btns = domiwyg.tool_btns, tool_html = '';
+      tool_btns = domiwyg.tool_btns, 
+      tool_styles = domiwyg.styles, 
+      tool_html = '<select class="domiwyg-styles-list"><option value="-1">-- Välj en stil --</option>', 
+      toolbar;
+
+    for (t = 0; t < tool_styles.length; t++)
+      {
+      tool_html += '<option value="' + t + '">' + tool_styles[t][2] + '</option>';
+      }
+
+    tool_html += '</select>';
 
     for (t = 0; t < tool_btns.length; t++)
       {
       tool_html += '<button class="dwcmd-' + tool_btns[t][0] + '" title="' + tool_btns[t][1] + '">' + tool_btns[t][1] + '</button>';
       }
 
-    app.appendChild(toDOMnode('<div class="domiwyg-toolbar">' + tool_html + '</div>'));
+    toolbar = app.appendChild(toDOMnode('<div class="domiwyg-toolbar">' + tool_html + '</div>'));
     self.domcrumbs = app.appendChild(toDOMnode('<div class="domiwyg-dom-crumbs">&nbsp;</div>'));
     domarea = self.domarea = app.appendChild(toDOMnode('<div class="domiwyg-area" contenteditable="true"></div>'));
     self.source_editor = app.appendChild(toDOMnode('<textarea class="domiwyg-source-editor hidden"></textarea>'));
+
     domarea.innerHTML = self.textarea.value;
     self.sanitize();
 
@@ -179,6 +192,7 @@ var domiwyg = {
     addEvent(domarea, 'focus', function() { addClass(app, 'focus'); });
     addEvent(domarea, 'blur', function() { removeClass(app, 'focus'); });
     addEvent(domarea, 'keyup', self.updateDomCrumbs, self);
+    addEvent(toolbar.getElementsByTagName('select')[0], 'change', self.addStylingElement, self);
     },
 
   clicking: function(e)
@@ -231,13 +245,60 @@ var domiwyg = {
       }
     },
 
-  addElement: function(node_name)
+  addStylingElement: function(e)
     {
-    var self = this, elm;
+    var self = this, 
+      list = getTarget(e), 
+      style = domiwyg.styles[list.value] || null, 
+      range, fragment, 
+      new_elem, ref_elem;
 
-    elm = document.createElement(node_name);
-    elm.appendChild(document.createTextNode(' '));
-    this.cur_elm.parentNode.insertBefore(elm, self.cur_elm.nextSibling);
+    if (style)
+      {
+      if (window.getSelection)
+        {
+        range = window.getSelection().getRangeAt(0);
+        fragment = range.extractContents() || document.createDocumentFragment();
+        new_elem = toDOMnode(style[0]);
+        new_elem.appendChild(fragment);
+
+        if (style[1])
+          {
+          ref_elem = range.startContainer;
+          if (ref_elem.nodeType == 3)
+            ref_elem = ref_elem.parentNode;
+
+          ref_elem.parentNode.insertBefore(new_elem, ref_elem);
+          }
+        else
+          {
+          range.insertNode(new_elem);
+          }
+        }
+      else if (document.selection)
+        {
+        range = document.selection.createRange();
+        new_elem = toDOMnode(style[0]);
+        new_elem.appendChild(toDOMnode(range.htmlText));
+
+        if (style[1])
+          {
+          ref_elem = range.parentElement();
+          alert(ref_elem.tagName);
+          if (ref_elem.parentNode.tagName == 'P')
+            ref_elem = ref_elem.parentNode;
+
+          ref_elem.parentNode.insertBefore(new_elem, ref_elem);
+          range.pasteHTML('');
+          }
+        else
+          {
+          range.pasteHTML(new_elem.innerHTML);
+          }
+        }
+      }
+
+    list.value = -1;
     },
 
   keyStrokes: function(e)
