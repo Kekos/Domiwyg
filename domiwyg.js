@@ -265,10 +265,18 @@ var domiwyg = {
         if (style[1])
           {
           ref_elem = range.startContainer;
+
           if (ref_elem.nodeType == 3)
             ref_elem = ref_elem.parentNode;
 
-          ref_elem.parentNode.insertBefore(new_elem, ref_elem);
+          if (hasClass(ref_elem, 'domiwyg-area'))
+            {
+            range.insertNode(new_elem);
+            }
+          else
+            {
+            ref_elem.parentNode.insertBefore(new_elem, ref_elem);
+            }
           }
         else
           {
@@ -279,21 +287,34 @@ var domiwyg = {
         {
         range = document.selection.createRange();
         new_elem = toDOMnode(style[0]);
-        new_elem.appendChild(toDOMnode(range.htmlText));
 
-        if (style[1])
+        /* First see if the returned range is a TextRange */
+        if (range.htmlText)
           {
-          ref_elem = range.parentElement();
-          alert(ref_elem.tagName);
-          if (ref_elem.parentNode.tagName == 'P')
-            ref_elem = ref_elem.parentNode;
+          new_elem.appendChild(toDOMnode(range.htmlText));
+
+          if (style[1])
+            {
+            ref_elem = range.parentElement();
+            alert(ref_elem.tagName);
+            if (ref_elem.parentNode.tagName == 'P')
+              ref_elem = ref_elem.parentNode;
+
+            ref_elem.parentNode.insertBefore(new_elem, ref_elem);
+            range.pasteHTML('');
+            }
+          else
+            {
+            range.pasteHTML(new_elem.innerHTML);
+            }
+          }
+        else // controlRange
+          {
+          ref_elem = range(0);
+          new_elem.appendChild(ref_elem.cloneNode(1));
 
           ref_elem.parentNode.insertBefore(new_elem, ref_elem);
-          range.pasteHTML('');
-          }
-        else
-          {
-          range.pasteHTML(new_elem.innerHTML);
+          ref_elem.parentNode.removeChild(ref_elem);
           }
         }
       }
