@@ -20,6 +20,12 @@ function removeTag(element)
   element.parentNode.removeChild(element);
   }
 
+function canHaveBlockElement(element)
+  {
+  var blocks = {blockquote: 0, div: 0, form: 0, td: 0};
+  return (element.tagName.toLowerCase() in blocks);
+  }
+
 var domiwyg = {
   tool_btns: [['Source', 'Toggle source editing'], ['Link', 'Create/edit link'], ['Image', 'Insert image'], ['Ulist', 'Insert unordered list'], ['Olist', 'Insert ordered list'], ['Table', 'Insert table']],
   styles: [['<p></p>', 1, 'Paragraph'], ['<h1></h1>', 1, 'Header 1'], ['<h2></h2>', 1, 'Header 2'], ['<h3></h3>', 1, 'Header 3'], ['<h4></h4>', 1, 'Header 4'], ['<h5></h5>', 1, 'Header 5'], 
@@ -75,6 +81,7 @@ var domiwyg = {
     self.restoreCursor = dw.restoreCursor;
     self.nodeInArea = dw.nodeInArea;
     self.getSelectedAreaElement = dw.getSelectedAreaElement;
+    self.getFirstContainer = dw.getFirstContainer;
     self.format = dw.format;
     self.cmdSource = dw.cmdSource;
     self.cmdLink = dw.cmdLink;
@@ -262,20 +269,18 @@ var domiwyg = {
         new_elem = toDOMnode(style[0]);
         new_elem.appendChild(fragment);
 
+        /* If the style is a block element */
         if (style[1])
           {
           ref_elem = range.startContainer;
-
-          if (ref_elem.nodeType == 3)
-            ref_elem = ref_elem.parentNode;
-
           if (hasClass(ref_elem, 'domiwyg-area'))
             {
             range.insertNode(new_elem);
             }
           else
             {
-            ref_elem.parentNode.insertBefore(new_elem, ref_elem);
+            ref_elem = self.getFirstContainer(ref_elem);
+            ref_elem.container.insertBefore(new_elem, ref_elem.reference);
             }
           }
         else
@@ -293,14 +298,11 @@ var domiwyg = {
           {
           new_elem.appendChild(toDOMnode(range.htmlText));
 
+          /* If the style is a block element */
           if (style[1])
             {
-            ref_elem = range.parentElement();
-            alert(ref_elem.tagName);
-            if (ref_elem.parentNode.tagName == 'P')
-              ref_elem = ref_elem.parentNode;
-
-            ref_elem.parentNode.insertBefore(new_elem, ref_elem);
+            ref_elem = self.getFirstContainer(range.parentElement());
+            ref_elem.container.insertBefore(new_elem, ref_elem.reference);
             range.pasteHTML('');
             }
           else
@@ -413,6 +415,23 @@ var domiwyg = {
         {
         element = null;
         }
+      }
+
+    return element;
+    },
+
+  getFirstContainer: function(element)
+    {
+    var container = element;
+    element = {container: element, reference: null};
+
+    while (1)
+      {
+      if (container.nodeType == 1 && canHaveBlockElement(container))
+        break;
+
+      element.reference = element.container;
+      container = element.container = container.parentNode;
       }
 
     return element;
