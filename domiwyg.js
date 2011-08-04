@@ -27,15 +27,19 @@ function canHaveBlockElement(element)
   }
 
 var domiwyg = {
-  tool_btns: [['Source', 'Toggle source editing'], ['Link', 'Create/edit link'], ['Image', 'Insert image'], ['Ulist', 'Insert unordered list'], ['Olist', 'Insert ordered list'], ['Table', 'Insert table']],
-  styles: [['<p></p>', 1, 'Paragraph'], ['<h1></h1>', 1, 'Header 1'], ['<h2></h2>', 1, 'Header 2'], ['<h3></h3>', 1, 'Header 3'], ['<h4></h4>', 1, 'Header 4'], ['<h5></h5>', 1, 'Header 5'], 
-    ['<h6></h6>', 1, 'Header 6'], ['<blockquote></blockquote>', 1, 'Blockquote']],
+  tool_btns: [['Source', 'toggle_src'], ['Link', 'create_link'], ['Image', 'insert_image'], ['Ulist', 'insert_ul'], ['Olist', 'insert_ol'], ['Table', 'insert_table']],
+  styles: [['<p></p>', 1, 'tag_p'], ['<h1></h1>', 1, 'tag_h1'], ['<h2></h2>', 1, 'tag_h2'], ['<h3></h3>', 1, 'tag_h3'], ['<h4></h4>', 1, 'tag_h4'], ['<h5></h5>', 1, 'tag_h5'], 
+    ['<h6></h6>', 1, 'tag_h6'], ['<blockquote></blockquote>', 1, 'tag_blockquote']],
   allowed: {a: {href: 0}, blockquote: {}, div: {}, em: {}, h1: {}, h2: {}, h3: {}, h4: {}, h5: {}, h6: {}, img: {alt: 0, src: 0}, li: {}, ol: {}, p: {}, span: {}, strong: {}, table: {}, tr: {}, td: {}, ul: {}},
   allowed_global: {'class': 0, id: 0, title: 0},
   lang: {err_format_support1: 'The format command ', err_format_support2: ' was not supported by your browser.', err_number_format: 'You must enter a number.', 
+    toggle_src: 'Toggle source editing', create_link: 'Create/edit link', insert_image: 'Insert image', insert_ul: 'Insert unordered list', insert_ol: 'Insert ordered list', insert_table: 'Insert table', 
+    ok: 'OK', cancel: 'Cancel', info_link_dlg: 'Write the address to where the link will lead. Also choose which protocol that should be used.', same_site: 'within same site', website: 'website', 
+    secure_site: 'secure site', email: 'e-mail', filetransfer: 'file transfer', info_link_delete: 'If you want to remove a link, select the <strong>entire</strong> link and leave the above field empty.', 
+    info_image_dlg: 'Write the address to the image.', image_url: 'Image URL', num_rows: 'Number of rows', num_cols: 'Number of columns', 
     no_elem_active: '(no element selected)', tag_a: 'Link', tag_blockquote: 'Blockquote', tag_div: 'Container', tag_em: 'Emphasized', tag_h1: 'Header 1', tag_h2: 'Header 2', 
     tag_h3: 'Header 3', tag_h4: 'Header 4', tag_h5: 'Header 5', tag_h6: 'Header 6', tag_img: 'Image', tag_li: 'List element', tag_ol: 'Ordered list', tag_p: 'Paragraph', 
-    tag_span: 'Span', tag_strong: 'Strong', tag_table: 'Table', tag_tr: 'Table row', tag_td: 'Table cell', tag_ul: 'Unordered list', cssclass: 'Class'},
+    tag_span: 'Span', tag_strong: 'Strong', tag_table: 'Table', tag_tr: 'Table row', tag_td: 'Table cell', tag_ul: 'Unordered list', cssclass: 'Class', select_style: '-- Select a style --'},
 
   find: function()
     {
@@ -168,21 +172,22 @@ var domiwyg = {
     {
     var self = this, 
       app = self.app, domarea, t, 
-      tool_btns = domiwyg.tool_btns, 
-      tool_styles = domiwyg.styles, 
-      tool_html = '<select class="domiwyg-styles-list"><option value="-1">-- Välj en stil --</option>', 
+      dw = domiwyg, lang = dw.lang, 
+      tool_btns = dw.tool_btns, 
+      tool_styles = dw.styles, 
+      tool_html = '<select class="domiwyg-styles-list"><option value="-1">' + lang.select_style + '</option>', 
       toolbar;
 
     for (t = 0; t < tool_styles.length; t++)
       {
-      tool_html += '<option value="' + t + '">' + tool_styles[t][2] + '</option>';
+      tool_html += '<option value="' + t + '">' + lang[tool_styles[t][2]] + '</option>';
       }
 
     tool_html += '</select>';
 
     for (t = 0; t < tool_btns.length; t++)
       {
-      tool_html += '<button class="dwcmd-' + tool_btns[t][0] + '" title="' + tool_btns[t][1] + '">' + tool_btns[t][1] + '</button>';
+      tool_html += '<button class="dwcmd-' + tool_btns[t][0] + '" title="' + tool_btns[t][1] + '">' + lang[tool_btns[t][1]] + '</button>';
       }
 
     toolbar = app.appendChild(toDOMnode('<div class="domiwyg-toolbar">' + tool_html + '</div>'));
@@ -482,7 +487,7 @@ var domiwyg = {
 
   cmdLink: function()
     {
-    var self = this, 
+    var self = this, lang = domiwyg.lang, 
       element = self.getSelectedAreaElement(), 
       node_name = null, link, colon;
 
@@ -491,17 +496,17 @@ var domiwyg = {
       node_name = element.nodeName.toLowerCase();
       self.storeCursor();
 
-      boxing.show('<h1>Infoga länk</h1>'
-        + '<p>Skriv in adressen dit länken ska leda. Välj även vilket protokoll som ska användas.</p>'
+      boxing.show('<h1>' + lang.create_link + '</h1>'
+        + '<p>' + lang.info_link_dlg + '</p>'
         + '<p><select id="dw_link_protocol">'
-        + '    <option value="">samma webbplats</option>'
-        + '    <option value="http:">http: (webbsida)</option>'
-        + '    <option value="https:">https: (säker sida)</option>'
-        + '    <option value="mailto:">mailto: (e-post)</option>'
-        + '    <option value= "ftp:">ftp: (filöverföring)</option>'
+        + '    <option value="">' + lang.same_site + '</option>'
+        + '    <option value="http:">http: (' + lang.website + ')</option>'
+        + '    <option value="https:">https: (' + lang.secure_site + ')</option>'
+        + '    <option value="mailto:">mailto: (' + lang.email + ')</option>'
+        + '    <option value= "ftp:">ftp: (' + lang.filetransfer + ')</option>'
         + '  </select> <input type="text" id="dw_link_url" value="www.example.com" /></p>'
-        + '<p>Om du vill ta bort en länk, markera <strong>hela</strong> länken och lämna fältet tomt här ovan.</p>'
-        + '<p><button id="btn_create_link" class="hide-boxing">OK</button> <button class="hide-boxing">Avbryt</button></p>', 400, 190);
+        + '<p>' + lang.info_link_delete + '</p>'
+        + '<p><button id="btn_create_link" class="hide-boxing">' + lang.ok + '</button> <button class="hide-boxing">' + lang.cancel + '</button></p>', 400, 190);
       elem('dw_link_url').focus();
 
       if (node_name)
@@ -571,16 +576,16 @@ var domiwyg = {
 
   cmdImage: function()
     {
-    var self = this;
+    var self = this, lang = domiwyg.lang;
 
     if (self.getSelectedAreaElement())
       {
       self.storeCursor();
 
-      boxing.show('<h1>Infoga bild</h1>'
-        + '<p>Skriv in adressen till bilden.</p>'
-        + '<p>Bild-URL: <input type="text" id="dw_img_url" value="" /></p>'
-        + '<p><button id="btn_insert_image" class="hide-boxing">OK</button> <button class="hide-boxing">Avbryt</button></p>', 400, 110);
+      boxing.show('<h1>' + lang.insert_image + '</h1>'
+        + '<p>' + lang.info_image_dlg + '</p>'
+        + '<p>' + lang.image_url + ': <input type="text" id="dw_img_url" value="" /></p>'
+        + '<p><button id="btn_insert_image" class="hide-boxing">' + lang.ok + '</button> <button class="hide-boxing">' + lang.cancel + '</button></p>', 400, 110);
 
       elem('dw_img_url').focus();
       addEvent(elem('btn_insert_image'), 'click', self.insertImage, self);
@@ -611,16 +616,17 @@ var domiwyg = {
 
   cmdTable: function()
     {
-    var self = this, element = self.getSelectedAreaElement();
+    var self = this, lang = domiwyg.lang, 
+      element = self.getSelectedAreaElement();
 
     if (element)
       {
       self.storeCursor();
 
-      boxing.show('<h1>Infoga tabell</h1>'
-        + '<p class="domiwyg-form"><label for="dw_num_rows">Antal rader:</label> <input type="text" id="dw_num_rows" value="" />'
-        + '  <label for="dw_num_cols">Antal kolumner:</label> <input type="text" id="dw_num_cols" value="" /></p>'
-        + '<p><button id="btn_insert_table" class="hide-boxing">OK</button> <button class="hide-boxing">Avbryt</button></p>', 400, 110);
+      boxing.show('<h1>' + lang.insert_table + '</h1>'
+        + '<p class="domiwyg-form"><label for="dw_num_rows">' + lang.num_rows + ':</label> <input type="text" id="dw_num_rows" value="" />'
+        + '  <label for="dw_num_cols">' + lang.num_cols + ':</label> <input type="text" id="dw_num_cols" value="" /></p>'
+        + '<p><button id="btn_insert_table" class="hide-boxing">' + lang.ok + '</button> <button class="hide-boxing">' + lang.cancel + '</button></p>', 400, 110);
 
       elem('dw_num_rows').focus();
       addEvent(elem('btn_insert_table'), 'click', function()
