@@ -659,7 +659,8 @@ var domiwyg = {
           }
         }
 
-      element.parentNode.insertBefore(table, element);
+      element = this.getFirstContainer(element);
+      element.container.insertBefore(table, element.reference);
       }
     }
   };
