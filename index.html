@@ -9,19 +9,49 @@
     .domiwyg-app
       {
       height: 380px;
-      border: 1px solid #000;
+      border: 1px solid #888;
       overflow: auto;
-      opacity: 0.5;
+      /*opacity: 0.5;*/
       }
     .domiwyg-app.focus { opacity: 1; }
-    .domiwyg-toolbar, .domiwyg-dom-crumbs
+    .domiwyg-toolbar
       {
-      background: #c0c0c0;
+      background: #ddd;
       }
+    .domiwyg-toolbar button
+      {
+      margin: 2px;
+      width: 22px;
+      height: 22px;
+      background-color: #ccc;
+      background-repeat: no-repeat;
+      border: 1px solid #777;
+      font-size: 0;
+      }
+    .domiwyg-toolbar button:hover, .domiwyg-toolbar button:focus
+      {
+      background-color: #eee;
+      outline: 0;
+      }
+    .domiwyg-toolbar button:active
+      {
+      background-color: #999;
+      }
+    .domiwyg-toolbar button::-moz-focus-inner
+      {
+      border: 0;
+      }
+    .dwcmd-Source { background-image: url('images/toggle_src.png'); }
+    .dwcmd-Link { background-image: url('images/create_link.png'); }
+    .dwcmd-Image { background-image: url('images/image.png'); }
+    .dwcmd-Ulist { background-image: url('images/unordered_list.png'); }
+    .dwcmd-Olist { background-image: url('images/ordered_list.png'); }
+    .dwcmd-Table { background-image: url('images/table.png'); }
     .domiwyg-dom-crumbs
       {
       padding: 5px;
-      font-size: 0.8em;
+      background: #eee;
+      font-size: 0.7em;
       }
     .domiwyg-area
       {
@@ -35,6 +65,7 @@
       border: 0;
       font-family: 'Courier New', Courier, monospace;
       }
+    .domiwyg-styles-list { margin: 2px; font-size: 0.8em; }
     .hidden { display: none; }
     .domiwyg-form { overflow: hidden; }
     .domiwyg-form label { display: block; clear: both; float: left; }
