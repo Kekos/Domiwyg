@@ -187,7 +187,7 @@ var domiwyg = {
 
     for (t = 0; t < tool_btns.length; t++)
       {
-      tool_html += '<button class="dwcmd-' + tool_btns[t][0] + '" title="' + tool_btns[t][1] + '">' + lang[tool_btns[t][1]] + '</button>';
+      tool_html += '<button class="dwcmd-' + tool_btns[t][0] + '" title="' + lang[tool_btns[t][1]] + '">' + lang[tool_btns[t][1]] + '</button>';
       }
 
     toolbar = app.appendChild(toDOMnode('<div class="domiwyg-toolbar">' + tool_html + '</div>'));
