@@ -13,12 +13,18 @@
   {
   height: 380px;
   border: 1px solid #888;
-  overflow: auto;
+  overflow: hidden;
   opacity: 0.5;
   }
 
 .domiwyg-app.focus { opacity: 1; }
 .domiwyg-toolbar { background: #ddd; }
+
+.domiwyg-styles-list
+  {
+  margin: 2px;
+  font-size: 0.8em;
+  }
 
 .domiwyg-toolbar button
   {
@@ -65,7 +71,8 @@
 .domiwyg-area
   {
   padding: 0.1px 0 0;
-  height: 334px;
+  height: 333px;
+  overflow: auto;
   }
 
 .domiwyg-source-editor
@@ -74,12 +81,6 @@
   width: 99%;
   border: 0;
   font-family: 'Courier New', Courier, monospace;
-  }
-
-.domiwyg-styles-list
-  {
-  margin: 2px;
-  font-size: 0.8em;
   }
 
 .domiwyg-form { overflow: hidden; }
