@@ -1,0 +1,98 @@
+/**
+ * DOMIWYG Style: domiwyg.css
+ * 
+ * @author Christoffer Lindahl <christoffer@kekos.se>
+ * @date 2011-08-07
+ * @version 1.0
+ */
+
+.has-domiwyg { display: none; }
+.hidden { display: none; }
+
+.domiwyg-app
+  {
+  height: 380px;
+  border: 1px solid #888;
+  overflow: auto;
+  opacity: 0.5;
+  }
+
+.domiwyg-app.focus { opacity: 1; }
+.domiwyg-toolbar { background: #ddd; }
+
+.domiwyg-toolbar button
+  {
+  margin: 2px;
+  width: 22px;
+  height: 22px;
+  background-color: #ccc;
+  background-repeat: no-repeat;
+  background-image: url('images/sprite.png');
+  border: 1px solid #777;
+  font-size: 0;
+  }
+
+.domiwyg-toolbar button:hover, .domiwyg-toolbar button:focus
+  {
+  background-color: #eee;
+  outline: 0;
+  }
+
+.domiwyg-toolbar button:active
+  {
+  background-color: #999;
+  }
+
+.domiwyg-toolbar button::-moz-focus-inner
+  {
+  border: 0;
+  }
+
+.dwcmd-Source { background-position: 2px 1px; }
+.dwcmd-Link { background-position: -16px 1px; }
+.dwcmd-Image { background-position: -34px 1px; }
+.dwcmd-Ulist { background-position: -52px 1px; }
+.dwcmd-Olist { background-position: -70px 1px; }
+.dwcmd-Table { background-position: -88px 1px; }
+
+.domiwyg-dom-crumbs
+  {
+  padding: 5px;
+  background: #eee;
+  font-size: 0.7em;
+  }
+
+.domiwyg-area
+  {
+  padding: 0.1px 0 0;
+  height: 334px;
+  }
+
+.domiwyg-source-editor
+  {
+  height: 330px;
+  width: 99%;
+  border: 0;
+  font-family: 'Courier New', Courier, monospace;
+  }
+
+.domiwyg-styles-list
+  {
+  margin: 2px;
+  font-size: 0.8em;
+  }
+
+.domiwyg-form { overflow: hidden; }
+
+.domiwyg-form label
+  {
+  display: block;
+  clear: both;
+  float: left;
+  }
+
+.domiwyg-form input
+  {
+  float: left;
+  margin-left: 5px;
+  }
