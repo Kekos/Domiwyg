@@ -1,3 +1,12 @@
+/**
+ * DOMIWYG Script: domiwyg.swedish.js - Swedish translation of Domiwyg
+ * Based on DOMcraft
+ * 
+ * @author Christoffer Lindahl <christoffer@kekos.se>
+ * @date 2011-08-09
+ * @version 1.0
+ */
+
 domiwyg.lang = {err_format_support1: 'Formateringskommandot ', err_format_support2: ' stöds inte i din webbläsare.', err_number_format: 'Du måste ange ett tal.', 
       toggle_src: 'Visa/dölj källkoden', create_link: 'Skapa/ändra länk', insert_image: 'Infoga bild', insert_ul: 'Infoga punktlista', insert_ol: 'Infoga numrerad lista', insert_table: 'Infoga tabell', 
       ok: 'OK', cancel: 'Avbryt', info_link_dlg: 'Skriv in adressen dit länken ska leda. Välj även vilket protokoll som ska användas.', same_site: 'samma webbplats', website: 'webbsida', 
