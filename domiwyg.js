@@ -4,7 +4,7 @@
  * 
  * @author Christoffer Lindahl <christoffer@kekos.se>
  * @date 2011-08-09
- * @version 1.0
+ * @version 1.0.1
  */
 
 function removeTag(element)
@@ -212,6 +212,8 @@ var domiwyg = {
     {
     var targ = getTarget(e), 
       cls = targ.className, space;
+
+    returnFalse(e);
 
     if (cls.indexOf('dwcmd-') > -1)
       {
