@@ -128,6 +128,7 @@ var domiwyg = {
       if (!(tag_name in dw.allowed))
         {
         removeTag(child);
+        --c;
         continue;
         }
       /* Remove empty tags */
