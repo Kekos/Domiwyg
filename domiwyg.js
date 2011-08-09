@@ -3,7 +3,7 @@
  * Based on DOMcraft
  * 
  * @author Christoffer Lindahl <christoffer@kekos.se>
- * @date 2011-07-12
+ * @date 2011-08-09
  * @version 1.0
  */
 
