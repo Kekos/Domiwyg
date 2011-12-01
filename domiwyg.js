@@ -88,6 +88,7 @@ var domiwyg = {
     self.caret = null;
 
     self.save = dw.save;
+    self.remove = dw.remove;
     self.sanitize = dw.sanitize;
     self.prettyHtml = dw.prettyHtml;
     self.init = dw.init;
@@ -123,6 +124,16 @@ var domiwyg = {
 
     self.sanitize()
     return self.prettyHtml();
+    },
+
+  remove: function()
+    {
+    var self = this;
+
+    removeClass(self.textarea, 'has-domiwyg');
+    self.textarea.value = self.save();
+    self.textarea.domiwyg = null;
+    self.app.parentNode.removeChild(self.app);
     },
 
   sanitize: function()
