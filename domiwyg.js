@@ -41,38 +41,36 @@ var domiwyg = {
     tag_h3: 'Header 3', tag_h4: 'Header 4', tag_h5: 'Header 5', tag_h6: 'Header 6', tag_img: 'Image', tag_li: 'List element', tag_ol: 'Ordered list', tag_p: 'Paragraph', 
     tag_span: 'Span', tag_strong: 'Strong', tag_table: 'Table', tag_tr: 'Table row', tag_td: 'Table cell', tag_ul: 'Unordered list', cssclass: 'Class', select_style: '-- Select a style --'},
 
+  create: function(textarea)
+    {
+    var app = textarea.parentNode.insertBefore(toDOMnode('<div id="domiwyg_' + 
+      textarea.id + '" class="domiwyg-app"></div>'), textarea);
+
+    textarea.domiwyg = new domiwyg.area(textarea, app);
+    removeClass(textarea, 'use-domiwyg');
+    addClass(textarea, 'has-domiwyg');
+    },
+
   find: function()
     {
     var textareas = document.getElementsByTagName('textarea'), 
-      t, textarea, app;
+      t, textarea;
 
     for (t = 0; t < textareas.length; t++)
       {
       textarea = textareas[t];
       if (hasClass(textarea, 'use-domiwyg'))
         {
-        app = textarea.parentNode.insertBefore(toDOMnode('<div id="domiwyg_' + 
-          textarea.id + '" class="domiwyg-app"></div>'), textarea);
-
-        textarea.domiwyg = new domiwyg.area(textarea, app);
-        removeClass(textarea, 'use-domiwyg');
-        addClass(textarea, 'has-domiwyg');
+        domiwyg.create(textarea);
         }
       }
     },
 
   append: function(textarea)
     {
-    var app;
-
     if (!hasClass(textarea, 'has-domiwyg'))
       {
-      app = textarea.parentNode.insertBefore(toDOMnode('<div id="domiwyg_' + 
-        textarea.id + '" class="domiwyg-app"></div>'), textarea);
-
-      textarea.domiwyg = new domiwyg.area(textarea, app);
-      removeClass(textarea, 'use-domiwyg');
-      addClass(textarea, 'has-domiwyg');
+      domiwyg.create(textarea);
       }
     },
 
