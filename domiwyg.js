@@ -60,6 +60,21 @@ var domiwyg = {
       }
     },
 
+  append: function(textarea)
+    {
+    var app;
+
+    if (!hasClass(textarea, 'has-domiwyg'))
+      {
+      app = textarea.parentNode.insertBefore(toDOMnode('<div id="domiwyg_' + 
+        textarea.id + '" class="domiwyg-app"></div>'), textarea);
+
+      textarea.domiwyg = new domiwyg.area(textarea, app);
+      removeClass(textarea, 'use-domiwyg');
+      addClass(textarea, 'has-domiwyg');
+      }
+    },
+
   area: function(textarea, app)
     {
     var dw = domiwyg,
