@@ -437,10 +437,6 @@ var domiwyg = {
         self.restoreCursor();
         }, 100);
       }
-    /*else if (key == 40) // Down
-      self.editElement(self.findElement(self.cur_elm, nextNode, firstChildElement));
-    else if (key == 38) // Up
-      self.editElement(self.findElement(self.cur_elm, previousNode, lastChildElement));*/
     },
 
   storeCursor: function()
