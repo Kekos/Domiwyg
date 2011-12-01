@@ -7,6 +7,34 @@
  * @version 1.0.1
  */
 
+function getOffsetTop(elem)
+  {
+  var off_top = elem.offsetTop, 
+    off_parent = elem.offsetParent;
+
+  while (off_parent)
+    {
+    off_top += off_parent.offsetTop;
+    off_parent = off_parent.offsetParent;
+    }
+
+  return off_top;
+  }
+
+function getOffsetLeft(elem)
+  {
+  var off_left = elem.offsetLeft, 
+    off_parent = elem.offsetParent;
+
+  while (off_parent)
+    {
+    off_left += off_parent.offsetLeft;
+    off_parent = off_parent.offsetParent;
+    }
+
+  return off_left;
+  }
+
 function removeTag(element)
   {
   var fragment = document.createDocumentFragment();
@@ -27,6 +55,7 @@ function canHaveBlockElement(element)
   }
 
 var domiwyg = {
+  dialog: null, 
   tool_btns: [['Source', 'toggle_src'], ['Link', 'create_link'], ['Image', 'insert_image'], ['Ulist', 'insert_ul'], ['Olist', 'insert_ol'], ['Table', 'insert_table']],
   styles: [['<p></p>', 1, 'tag_p'], ['<h1></h1>', 1, 'tag_h1'], ['<h2></h2>', 1, 'tag_h2'], ['<h3></h3>', 1, 'tag_h3'], ['<h4></h4>', 1, 'tag_h4'], ['<h5></h5>', 1, 'tag_h5'], 
     ['<h6></h6>', 1, 'tag_h6'], ['<blockquote></blockquote>', 1, 'tag_blockquote']],
@@ -40,6 +69,43 @@ var domiwyg = {
     no_elem_active: '(no element selected)', tag_a: 'Link', tag_blockquote: 'Blockquote', tag_div: 'Container', tag_em: 'Emphasized', tag_h1: 'Header 1', tag_h2: 'Header 2', 
     tag_h3: 'Header 3', tag_h4: 'Header 4', tag_h5: 'Header 5', tag_h6: 'Header 6', tag_img: 'Image', tag_li: 'List element', tag_ol: 'Ordered list', tag_p: 'Paragraph', 
     tag_span: 'Span', tag_strong: 'Strong', tag_table: 'Table', tag_tr: 'Table row', tag_td: 'Table cell', tag_ul: 'Unordered list', cssclass: 'Class', select_style: '-- Select a style --'},
+
+  showDialog: function(html, caller)
+    {
+    var dw = domiwyg,
+      dialog = dw.dialog;
+
+    if (!dialog)
+      {
+      dialog = dw.dialog = document.createElement('div');
+      dialog.id = 'domiwyg_dialog';
+      document.body.appendChild(dialog);
+      addEvent(document, 'click', function(e)
+        {
+        var targ = getTarget(e);
+        if (hasClass(targ, 'hide-dialog'))
+          {
+          returnFalse(e);
+          dw.hideDialog();
+          }
+        });
+      }
+
+    dialog.innerHTML = html;
+    dialog.style.display = 'block';
+    dialog.style.top = getOffsetTop(caller) + caller.offsetHeight + 'px';
+    dialog.style.left = getOffsetLeft(caller) + 'px';
+    },
+
+  hideDialog: function()
+    {
+    var dw = domiwyg;
+    if (dw.dialog)
+      {
+      dw.dialog.style.display = 'none';
+      dw.dialog.innerHTML = '';
+      }
+    },
 
   create: function(textarea)
     {
@@ -227,7 +293,7 @@ var domiwyg = {
     addEvent(app, 'click', self.clicking, self);
     addEvent(app, 'keyup', self.keyStrokes, self);
     addEvent(domarea, 'click', self.updateDomCrumbs, self);
-    addEvent(domarea, 'focus', function() { addClass(app, 'focus'); });
+    addEvent(domarea, 'focus', function() { addClass(app, 'focus'); dw.hideDialog(); });
     addEvent(domarea, 'blur', function() { removeClass(app, 'focus'); });
     addEvent(domarea, 'keyup', self.updateDomCrumbs, self);
     addEvent(toolbar.getElementsByTagName('select')[0], 'change', self.addStylingElement, self);
@@ -513,9 +579,11 @@ var domiwyg = {
       }
     },
 
-  cmdLink: function()
+  cmdLink: function(btn)
     {
-    var self = this, lang = domiwyg.lang, 
+    var self = this, 
+      dw = domiwyg, 
+      lang = dw.lang, 
       element = self.getSelectedAreaElement(), 
       node_name = null, link, colon;
 
@@ -524,7 +592,7 @@ var domiwyg = {
       node_name = element.nodeName.toLowerCase();
       self.storeCursor();
 
-      boxing.show('<h1>' + lang.create_link + '</h1>'
+      dw.showDialog('<h1>' + lang.create_link + '</h1>'
         + '<p>' + lang.info_link_dlg + '</p>'
         + '<p><select id="dw_link_protocol">'
         + '    <option value="">' + lang.same_site + '</option>'
@@ -534,7 +602,7 @@ var domiwyg = {
         + '    <option value= "ftp:">ftp: (' + lang.filetransfer + ')</option>'
         + '  </select> <input type="text" id="dw_link_url" value="www.example.com" /></p>'
         + '<p>' + lang.info_link_delete + '</p>'
-        + '<p><button id="btn_create_link" class="hide-boxing">' + lang.ok + '</button> <button class="hide-boxing">' + lang.cancel + '</button></p>', 400, 190);
+        + '<p><button id="btn_create_link" class="hide-dialog">' + lang.ok + '</button> <button class="hide-dialog">' + lang.cancel + '</button></p>', btn);
       elem('dw_link_url').focus();
 
       if (node_name)
@@ -564,7 +632,7 @@ var domiwyg = {
         }
       else
         {
-        boxing.hide();
+        dw.hideDialog();
         }
       }
     },
@@ -602,18 +670,20 @@ var domiwyg = {
       }
     },
 
-  cmdImage: function()
+  cmdImage: function(btn)
     {
-    var self = this, lang = domiwyg.lang;
+    var self = this, 
+      dw = domiwyg, 
+      lang = dw.lang;
 
     if (self.getSelectedAreaElement())
       {
       self.storeCursor();
 
-      boxing.show('<h1>' + lang.insert_image + '</h1>'
+      dw.showDialog('<h1>' + lang.insert_image + '</h1>'
         + '<p>' + lang.info_image_dlg + '</p>'
         + '<p>' + lang.image_url + ': <input type="text" id="dw_img_url" value="" /></p>'
-        + '<p><button id="btn_insert_image" class="hide-boxing">' + lang.ok + '</button> <button class="hide-boxing">' + lang.cancel + '</button></p>', 400, 110);
+        + '<p><button id="btn_insert_image" class="hide-dialog">' + lang.ok + '</button> <button class="hide-dialog">' + lang.cancel + '</button></p>', btn);
 
       elem('dw_img_url').focus();
       addEvent(elem('btn_insert_image'), 'click', self.insertImage, self);
@@ -642,19 +712,21 @@ var domiwyg = {
     this.format('insertorderedlist');
     },
 
-  cmdTable: function()
+  cmdTable: function(btn)
     {
-    var self = this, lang = domiwyg.lang, 
+    var self = this, 
+      dw = domiwyg, 
+      lang = domiwyg.lang, 
       element = self.getSelectedAreaElement();
 
     if (element)
       {
       self.storeCursor();
 
-      boxing.show('<h1>' + lang.insert_table + '</h1>'
+      dw.showDialog('<h1>' + lang.insert_table + '</h1>'
         + '<p class="domiwyg-form"><label for="dw_num_rows">' + lang.num_rows + ':</label> <input type="text" id="dw_num_rows" value="" />'
         + '  <label for="dw_num_cols">' + lang.num_cols + ':</label> <input type="text" id="dw_num_cols" value="" /></p>'
-        + '<p><button id="btn_insert_table" class="hide-boxing">' + lang.ok + '</button> <button class="hide-boxing">' + lang.cancel + '</button></p>', 400, 110);
+        + '<p><button id="btn_insert_table" class="hide-dialog">' + lang.ok + '</button> <button class="hide-dialog">' + lang.cancel + '</button></p>', btn);
 
       elem('dw_num_rows').focus();
       addEvent(elem('btn_insert_table'), 'click', function()
