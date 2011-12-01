@@ -49,13 +49,14 @@ var domiwyg = {
     for (t = 0; t < textareas.length; t++)
       {
       textarea = textareas[t];
-      if (textarea.className.indexOf('use-domiwyg') > -1)
+      if (hasClass(textarea, 'use-domiwyg'))
         {
         app = textarea.parentNode.insertBefore(toDOMnode('<div id="domiwyg_' + 
           textarea.id + '" class="domiwyg-app"></div>'), textarea);
 
         textarea.domiwyg = new domiwyg.area(textarea, app);
-        textarea.className = textarea.className.replace(/\buse-domiwyg\b/, 'has-domiwyg');
+        removeClass(textarea, 'use-domiwyg');
+        addClass(textarea, 'has-domiwyg');
         }
       }
     },
