@@ -3,8 +3,8 @@
  * Based on DOMcraft
  * 
  * @author Christoffer Lindahl <christoffer@kekos.se>
- * @date 2011-08-09
- * @version 1.0.1
+ * @date 2011-12-01
+ * @version 1.1
  */
 
 function getOffsetTop(elem)
