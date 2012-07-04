@@ -2,8 +2,8 @@
  * DOMIWYG Style: domiwyg.css
  * 
  * @author Christoffer Lindahl <christoffer@kekos.se>
- * @date 2011-12-01
- * @version 1.1
+ * @date 2012-07-04
+ * @version 1.2
  */
 
 .has-domiwyg { display: none; }
@@ -91,6 +91,7 @@
   position: absolute;
   background: #fff;
   border: 1px solid #777;
+  z-index: 999;
   }
 
 #domiwyg_dialog h1
