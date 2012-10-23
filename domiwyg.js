@@ -205,7 +205,8 @@ var domiwyg = {
   sanitize: function()
     {
     var dw = domiwyg, 
-      children = this.domarea.getElementsByTagName('*'), 
+      domarea = this.domarea, 
+      children = domarea.getElementsByTagName('*'), 
       c, child, tag_name, attributes, a, 
       attribute_name;
 
@@ -238,6 +239,21 @@ var domiwyg = {
           {
           child.removeAttribute(attribute_name);
           }
+        }
+      }
+
+    /* Remove HTML comments */
+    c = 0;
+    while (child = domarea.childNodes.item(c))
+      {
+      if (child.nodeType === 8)
+        {
+        domarea.removeChild(child);
+        --c;
+        }
+      else
+        {
+        ++c;
         }
       }
     },
