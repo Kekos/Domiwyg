@@ -3,8 +3,8 @@
  * Based on DOMcraft
  * 
  * @author Christoffer Lindahl <christoffer@kekos.se>
- * @date 2011-12-01
- * @version 1.1
+ * @date 2012-10-22
+ * @version 1.2
  */
 
 function getOffsetTop(elem)
@@ -59,7 +59,7 @@ var domiwyg = {
   tool_btns: [['Source', 'toggle_src'], ['Link', 'create_link'], ['Image', 'insert_image'], ['Ulist', 'insert_ul'], ['Olist', 'insert_ol'], ['Table', 'insert_table']],
   styles: [['<p></p>', 1, 'tag_p'], ['<h1></h1>', 1, 'tag_h1'], ['<h2></h2>', 1, 'tag_h2'], ['<h3></h3>', 1, 'tag_h3'], ['<h4></h4>', 1, 'tag_h4'], ['<h5></h5>', 1, 'tag_h5'], 
     ['<h6></h6>', 1, 'tag_h6'], ['<blockquote></blockquote>', 1, 'tag_blockquote']],
-  allowed: {a: {href: 0}, blockquote: {}, div: {}, em: {}, h1: {}, h2: {}, h3: {}, h4: {}, h5: {}, h6: {}, img: {alt: 0, src: 0}, li: {}, ol: {}, p: {}, span: {}, strong: {}, table: {}, tr: {}, td: {}, ul: {}},
+  allowed: {a: {href: 0}, blockquote: {}, div: {}, em: {}, h1: {}, h2: {}, h3: {}, h4: {}, h5: {}, h6: {}, img: {alt: 0, src: 0, width: 0, height: 0}, li: {}, ol: {}, p: {}, span: {}, strong: {}, table: {}, tr: {}, td: {}, ul: {}},
   allowed_global: {'class': 0, id: 0, title: 0},
   lang: {err_format_support1: 'The format command ', err_format_support2: ' was not supported by your browser.', err_number_format: 'You must enter a number.', 
     toggle_src: 'Toggle source editing', create_link: 'Create/edit link', insert_image: 'Insert image', insert_ul: 'Insert unordered list', insert_ol: 'Insert ordered list', insert_table: 'Insert table', 
@@ -234,7 +234,7 @@ var domiwyg = {
       for (a = 0; a < attributes.length; a++)
         {
         attribute_name = attributes[a].name;
-        if (!(attribute_name in dw.allowed[tag_name]) && !(attribute_name in dw.allowed_global))
+        if (!(attribute_name in dw.allowed[tag_name]) && !(attribute_name in dw.allowed_global) && attribute_name.indexOf('data-') > 0)
           {
           child.removeAttribute(attribute_name);
           }
