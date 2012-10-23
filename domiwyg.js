@@ -263,7 +263,7 @@ var domiwyg = {
     var html = this.domarea.innerHTML.replace(/<\/?(\w+)((?:[^'">]*|'[^']*'|"[^"]*")*)>/g,
       function(tag_body, tag_name, tag_attr)
         {
-        tag_attr = tag_attr.replace(/(\w+)(=+)(\w+)/g, '$1$2"$3"'); // Insert " around attribute values where missing
+        //tag_attr = tag_attr.replace(/(\w+)(=+)(\w+)/g, '$1$2"$3"'); // Insert " around attribute values where missing
         tag_name = tag_name.toLowerCase();
         var closing_tag = (tag_body.match(/^<\//));
         if (closing_tag)
