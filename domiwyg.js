@@ -3,8 +3,8 @@
  * Based on DOMcraft
  * 
  * @author Christoffer Lindahl <christoffer@kekos.se>
- * @date 2012-10-22
- * @version 1.2
+ * @date 2012-12-09
+ * @version 1.3
  */
 
 function getOffsetTop(elem)
@@ -649,11 +649,15 @@ var domiwyg = {
       }
     },
 
-  createLink: function(element)
+  createLink: function(element, protocol, url)
     {
-    var self = this, 
-      protocol = elem('dw_link_protocol').value, 
+    var self = this;
+
+    if (!protocol && !url)
+      {
+      protocol = elem('dw_link_protocol').value;
       url = elem('dw_link_url').value;
+      }
 
     self.restoreCursor();
 
